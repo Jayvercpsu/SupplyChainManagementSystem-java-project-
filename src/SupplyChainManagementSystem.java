@@ -54,26 +54,31 @@ public class SupplyChainManagementSystem extends JFrame {
         JButton showOrdersButton = new JButton("Show Orders");
         JButton showInventoryButton = new JButton("Show Inventory");
         JButton showLogisticsButton = new JButton("Show Logistics");
+        JButton resetAllButton = new JButton("Reset All Data");
 
         showSuppliersButton.setBackground(new Color(30, 144, 255));
         showOrdersButton.setBackground(new Color(30, 144, 255));
         showInventoryButton.setBackground(new Color(30, 144, 255));
         showLogisticsButton.setBackground(new Color(30, 144, 255));
+        resetAllButton.setBackground(new Color(255, 69, 0));  // Red color for reset button
 
         showSuppliersButton.setForeground(Color.WHITE);
         showOrdersButton.setForeground(Color.WHITE);
         showInventoryButton.setForeground(Color.WHITE);
         showLogisticsButton.setForeground(Color.WHITE);
+        resetAllButton.setForeground(Color.WHITE);
 
         showSuppliersButton.addActionListener(e -> displaySuppliers());
         showOrdersButton.addActionListener(e -> displayOrders());
         showInventoryButton.addActionListener(e -> displayInventory());
         showLogisticsButton.addActionListener(e -> displayLogistics());
+        resetAllButton.addActionListener(e -> resetAllData());
 
         actionPanel.add(showSuppliersButton);
         actionPanel.add(showOrdersButton);
         actionPanel.add(showInventoryButton);
         actionPanel.add(showLogisticsButton);
+        actionPanel.add(resetAllButton);  // Add reset button
 
         mainPanel.add(actionPanel, BorderLayout.NORTH);
 
@@ -137,6 +142,34 @@ public class SupplyChainManagementSystem extends JFrame {
         add(mainPanel, BorderLayout.CENTER);
     }
 
+    // Reset all data
+    private void resetAllData() {
+        // Clear collections
+        supplierDetails.clear();
+        orderQueue.clear();
+        inventory.clear();
+        logistics.clear();
+
+        // Clear input fields
+        supplierNameField.setText("");
+        supplierDetailField.setText("");
+        orderField.setText("");
+        inventoryField.setText("");
+        logisticsField.setText("");
+
+        // Optionally, reset the database records (clear all data from tables)
+        try (Connection connection = DBHelper.getConnection()) {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("DELETE FROM suppliers");
+            statement.executeUpdate("DELETE FROM orders");
+            statement.executeUpdate("DELETE FROM inventory");
+            statement.executeUpdate("DELETE FROM logistics");
+            displayArea.append("All data has been reset.\n");
+        } catch (SQLException e) {
+            displayArea.append("Error resetting data in database: " + e.getMessage() + "\n");
+        }
+    }
+
     // Database Connection Helper
     public static class DBHelper {
 
@@ -148,7 +181,6 @@ public class SupplyChainManagementSystem extends JFrame {
             return DriverManager.getConnection(DB_URL, USER, PASS);
         }
     }
-
     // Supplier Management
     private void addSupplier() {
         String supplierName = supplierNameField.getText();
