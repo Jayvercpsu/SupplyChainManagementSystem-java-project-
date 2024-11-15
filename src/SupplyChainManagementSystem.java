@@ -5,10 +5,6 @@ import java.awt.event.*;
 import java.sql.*;
 import java.util.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 public class SupplyChainManagementSystem extends JFrame {
 
     // Supplier Management
@@ -29,16 +25,20 @@ public class SupplyChainManagementSystem extends JFrame {
 
     public SupplyChainManagementSystem() {
         setTitle("Supply Chain Management System");
-        setSize(800, 600);
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(20, 20));
+
+        // Set background color
+        getContentPane().setBackground(new Color(240, 240, 240));
 
         // Display Area - Larger
         displayArea = new JTextArea();
         displayArea.setEditable(false);
+        displayArea.setFont(new Font("Arial", Font.PLAIN, 14));
         JScrollPane scrollPane = new JScrollPane(displayArea);
         scrollPane.setPreferredSize(new Dimension(800, 200));
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Output Log"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1), "Output Log", TitledBorder.LEFT, TitledBorder.TOP));
         add(scrollPane, BorderLayout.SOUTH);
 
         // Panel for Input Fields and Buttons
@@ -48,12 +48,22 @@ public class SupplyChainManagementSystem extends JFrame {
         // Action buttons at the top
         JPanel actionPanel = new JPanel();
         actionPanel.setBorder(BorderFactory.createTitledBorder("Actions"));
-        actionPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        actionPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         JButton showSuppliersButton = new JButton("Show Suppliers");
         JButton showOrdersButton = new JButton("Show Orders");
         JButton showInventoryButton = new JButton("Show Inventory");
         JButton showLogisticsButton = new JButton("Show Logistics");
+
+        showSuppliersButton.setBackground(new Color(30, 144, 255));
+        showOrdersButton.setBackground(new Color(30, 144, 255));
+        showInventoryButton.setBackground(new Color(30, 144, 255));
+        showLogisticsButton.setBackground(new Color(30, 144, 255));
+
+        showSuppliersButton.setForeground(Color.WHITE);
+        showOrdersButton.setForeground(Color.WHITE);
+        showInventoryButton.setForeground(Color.WHITE);
+        showLogisticsButton.setForeground(Color.WHITE);
 
         showSuppliersButton.addActionListener(e -> displaySuppliers());
         showOrdersButton.addActionListener(e -> displayOrders());
@@ -68,8 +78,8 @@ public class SupplyChainManagementSystem extends JFrame {
         mainPanel.add(actionPanel, BorderLayout.NORTH);
 
         // Input Section - Smaller input fields and buttons, centered
-        JPanel inputPanel = new JPanel(new GridLayout(5, 3, 5, 5));
-        inputPanel.setPreferredSize(new Dimension(400, 200));
+        JPanel inputPanel = new JPanel(new GridLayout(6, 3, 10, 10));
+        inputPanel.setPreferredSize(new Dimension(400, 250));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Input Section"));
 
         // Supplier input
@@ -207,14 +217,15 @@ public class SupplyChainManagementSystem extends JFrame {
             } catch (SQLException e) {
                 displayArea.append("Error placing order: " + e.getMessage() + "\n");
             }
+
             orderField.setText("");
         } else {
-            displayArea.append("Order field is empty.\n");
+            displayArea.append("Please enter order details.\n");
         }
     }
 
+    // Display Orders
     private void displayOrders() {
-        // Retrieve orders from database
         try (Connection connection = DBHelper.getConnection()) {
             String query = "SELECT * FROM orders";
             try (Statement statement = connection.createStatement()) {
@@ -225,8 +236,8 @@ public class SupplyChainManagementSystem extends JFrame {
                     displayArea.append("Orders:\n");
                     do {
                         int id = resultSet.getInt("id");
-                        String details = resultSet.getString("order_details");
-                        displayArea.append("Order ID: " + id + ", Details: " + details + "\n");
+                        String orderDetails = resultSet.getString("order_details");
+                        displayArea.append("ID: " + id + ", Order: " + orderDetails + "\n");
                     } while (resultSet.next());
                 }
             }
@@ -239,7 +250,7 @@ public class SupplyChainManagementSystem extends JFrame {
     private void addInventoryItem() {
         String item = inventoryField.getText();
         if (!item.isEmpty()) {
-            // Insert inventory item into database
+            // Add inventory item to database
             try (Connection connection = DBHelper.getConnection()) {
                 String query = "INSERT INTO inventory (item_name) VALUES (?)";
                 try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -252,14 +263,15 @@ public class SupplyChainManagementSystem extends JFrame {
             } catch (SQLException e) {
                 displayArea.append("Error adding inventory item: " + e.getMessage() + "\n");
             }
+
             inventoryField.setText("");
         } else {
-            displayArea.append("Inventory field is empty.\n");
+            displayArea.append("Please enter an inventory item.\n");
         }
     }
 
+    // Display Inventory
     private void displayInventory() {
-        // Retrieve inventory items from database
         try (Connection connection = DBHelper.getConnection()) {
             String query = "SELECT * FROM inventory";
             try (Statement statement = connection.createStatement()) {
@@ -282,29 +294,30 @@ public class SupplyChainManagementSystem extends JFrame {
 
     // Logistics Coordination
     private void addLogisticsDetail() {
-        String schedule = logisticsField.getText();
-        if (!schedule.isEmpty()) {
-            // Insert logistics schedule into database
+        String detail = logisticsField.getText();
+        if (!detail.isEmpty()) {
+            // Add logistics detail to database
             try (Connection connection = DBHelper.getConnection()) {
                 String query = "INSERT INTO logistics (schedule_details) VALUES (?)";
                 try (PreparedStatement statement = connection.prepareStatement(query)) {
-                    statement.setString(1, schedule);
+                    statement.setString(1, detail);
                     int rowsAffected = statement.executeUpdate();
                     if (rowsAffected > 0) {
-                        displayArea.append("Added logistics schedule: " + schedule + "\n");
+                        displayArea.append("Added logistics detail: " + detail + "\n");
                     }
                 }
             } catch (SQLException e) {
-                displayArea.append("Error adding logistics schedule: " + e.getMessage() + "\n");
+                displayArea.append("Error adding logistics detail: " + e.getMessage() + "\n");
             }
+
             logisticsField.setText("");
         } else {
-            displayArea.append("Logistics schedule field is empty.\n");
+            displayArea.append("Please enter logistics details.\n");
         }
     }
 
+    // Display Logistics
     private void displayLogistics() {
-        // Retrieve logistics from database
         try (Connection connection = DBHelper.getConnection()) {
             String query = "SELECT * FROM logistics";
             try (Statement statement = connection.createStatement()) {
@@ -312,11 +325,11 @@ public class SupplyChainManagementSystem extends JFrame {
                 if (!resultSet.next()) {
                     displayArea.append("No logistics to display.\n");
                 } else {
-                    displayArea.append("Logistics:\n");
+                    displayArea.append("Logistics Schedule:\n");
                     do {
                         int id = resultSet.getInt("id");
-                        String schedule = resultSet.getString("schedule_details");
-                        displayArea.append("Logistics ID: " + id + ", Schedule: " + schedule + "\n");
+                        String scheduleDetails = resultSet.getString("schedule_details");
+                        displayArea.append("ID: " + id + ", Schedule: " + scheduleDetails + "\n");
                     } while (resultSet.next());
                 }
             }
