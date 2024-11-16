@@ -1,0 +1,77 @@
+ 
+Database Connection Helper (DBHelper)
+- Purpose: Establishes a connection to the MySQL database.
+- Details:
+  - The database URL (DB_URL) points to the `supply_chain_db` database.
+  - The username (USER) and password (PASS) are set to XAMPP defaults (root and "").
+  - `getConnection()` returns a `Connection` object to interact with the database.
+
+
+
+Supplier Management
+1. `addSupplier()`:
+   - Adds a new supplier to the `suppliers` table.
+   - Executes an `INSERT INTO suppliers (name, details) VALUES (?, ?)` query using a `PreparedStatement`.
+   - Displays feedback in the `displayArea`.
+
+2. `displaySuppliers()`:
+   - Fetches all suppliers from the `suppliers` table.
+   - Executes a `SELECT * FROM suppliers` query.
+   - Iterates over the `ResultSet` and displays supplier information (ID, name, details) in the `displayArea`.
+
+
+
+Order Processing
+1. `placeOrder()`:
+   - Adds a new order to the `orders` table.
+   - Executes an `INSERT INTO orders (order_details) VALUES (?)` query.
+   - Displays feedback in the `displayArea`.
+
+2. `displayOrders()`:
+   - Fetches all orders from the `orders` table.
+   - Executes a `SELECT * FROM orders` query.
+   - Iterates over the `ResultSet` and displays order details (ID, details) in the `displayArea`.
+
+
+
+Inventory Tracking
+1. `addInventoryItem()`:
+   - Adds a new inventory item to the `inventory` table.
+   - Executes an `INSERT INTO inventory (item_name) VALUES (?)` query.
+   - Displays feedback in the `displayArea`.
+
+2. `displayInventory()`:
+   - Fetches all inventory items from the `inventory` table.
+   - Executes a `SELECT * FROM inventory` query.
+   - Iterates over the `ResultSet` and displays inventory details (ID, item name) in the `displayArea`.
+
+
+
+Logistics Coordination
+1. `addLogisticsDetail()`:
+   - Adds a new logistics schedule to the `logistics` table.
+   - Executes an `INSERT INTO logistics (schedule_details) VALUES (?)` query.
+   - Displays feedback in the `displayArea`.
+
+2. `displayLogistics()`:
+   - Fetches all logistics schedules from the `logistics` table.
+   - Executes a `SELECT * FROM logistics` query.
+   - Iterates over the `ResultSet` and displays logistics details (ID, schedule) in the `displayArea`.
+
+
+
+Reset All Data
+1. `resetAllData()`:
+   - Clears all data from the `suppliers`, `orders`, `inventory`, and `logistics` tables.
+   - Executes `DELETE FROM` queries for each table using a `Statement`.
+   - Displays a confirmation message in the `displayArea`.
+
+
+
+Summary
+- All database interactions use JDBC to connect, execute queries, and manage data in MySQL.
+- Queries are structured to:
+  - Insert (`INSERT INTO`)
+  - Retrieve (`SELECT *`)
+  - Delete (`DELETE FROM`) data.
+- Results are displayed in the `displayArea` for user feedback.

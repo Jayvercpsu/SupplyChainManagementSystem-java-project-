@@ -1,0 +1,95 @@
+1. Database Connection
+
+public class DBHelper {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/supply_chain_db";
+    private static final String USER = "root";
+    private static final String PASS = "";
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, USER, PASS);
+    }
+}
+
+How it works:
+
+Establishes a connection to the MySQL database using JDBC.
+getConnection() is called in other parts of the program to interact with the database.
+
+
+
+
+2. Adding a Supplier
+
+public void addSupplier(String name, String details) {
+    try (Connection conn = DBHelper.getConnection();
+         PreparedStatement stmt = conn.prepareStatement("INSERT INTO suppliers (name, details) VALUES (?, ?)")) {
+        stmt.setString(1, name);
+        stmt.setString(2, details);
+        stmt.executeUpdate();
+        displayArea.setText("Supplier added successfully!");
+    } catch (SQLException e) {
+        displayArea.setText("Error adding supplier: " + e.getMessage());
+    }
+}
+
+How it works:
+
+Prepares an SQL INSERT query with placeholders (?).
+Sets the values for the placeholders using setString().
+Executes the query with executeUpdate() to insert the supplier.
+
+
+
+3. Displaying All Suppliers 
+
+public void displaySuppliers() {
+    try (Connection conn = DBHelper.getConnection();
+         Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery("SELECT * FROM suppliers")) {
+        StringBuilder output = new StringBuilder("Suppliers:\n");
+        while (rs.next()) {
+            output.append("ID: ").append(rs.getInt("id"))
+                  .append(", Name: ").append(rs.getString("name"))
+                  .append(", Details: ").append(rs.getString("details")).append("\n");
+        }
+        displayArea.setText(output.toString());
+    } catch (SQLException e) {
+        displayArea.setText("Error fetching suppliers: " + e.getMessage());
+    }
+}
+
+How it works:
+
+Executes a SELECT query to fetch all records from the suppliers table.
+Loops through the ResultSet to retrieve data for each supplier.
+Displays the results in the displayArea.
+
+
+
+4. Resetting All Data
+
+public void resetAllData() {
+    String[] tables = {"suppliers", "orders", "inventory", "logistics"};
+    try (Connection conn = DBHelper.getConnection(); Statement stmt = conn.createStatement()) {
+        for (String table : tables) {
+            stmt.executeUpdate("DELETE FROM " + table);
+        }
+        displayArea.setText("All data reset successfully!");
+    } catch (SQLException e) {
+        displayArea.setText("Error resetting data: " + e.getMessage());
+    }
+}
+
+How it works:
+
+
+Deletes all records from the specified tables using DELETE FROM.
+Loops through an array of table names to execute the delete operation for each table.
+
+5. General Notes
+Connection Management: The try-with-resources statement ensures the connection, statement, and result set are automatically closed, preventing resource leaks.
+Error Handling: Each method includes a catch block to handle SQL exceptions and provide feedback.
+Database Operations:
+INSERT: Adds new records.
+SELECT: Retrieves data.
+DELETE: Clears all data from a table.
